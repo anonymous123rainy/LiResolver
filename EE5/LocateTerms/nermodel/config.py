@@ -57,7 +57,7 @@ class Config():
 
 
     #file_path = "model/LocateTerms/"
-    file_path = "/media/data2/gaoya/OSSL2/EE5/LocateTerms/"
+    file_path = "/xxx/LiResolver/EE5/LocateTerms/"
 
     # general config
     dir_output = file_path+"results/test/"
