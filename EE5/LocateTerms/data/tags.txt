@@ -1,0 +1,9 @@
+I-Condition
+I-Attitude
+B-Recipient
+B-Action
+I-Action
+O
+B-Condition
+I-Recipient
+B-Attitude

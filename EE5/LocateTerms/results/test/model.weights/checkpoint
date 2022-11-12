@@ -1,0 +1,2 @@
+model_checkpoint_path: "/media/data2/gaoya/OSSL2/EE5/LocateTerms/results/test/model.weights/"
+all_model_checkpoint_paths: "/media/data2/gaoya/OSSL2/EE5/LocateTerms/results/test/model.weights/"
