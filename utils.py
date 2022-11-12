@@ -24,10 +24,6 @@ from sklearn.decomposition import PCA
 from model.config import config as term_config
 
 
-'''
-文本处理相关
-'''
-
 def cleanText(text):
     '''
     对英文做简单的数据清洗预处理
