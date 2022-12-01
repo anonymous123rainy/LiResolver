@@ -11,7 +11,8 @@ import os
 import utils
 
 rootDir = os.path.dirname(os.path.abspath(__file__))
-unDir = os.path.join(os.path.dirname(rootDir), 'repos') #####
+#unDir = os.path.join(os.path.dirname(rootDir), 'repos') #####
+unDir = os.path.join(rootDir, 'repos')
 
 
 outputDir000 = rootDir + '/output/'
