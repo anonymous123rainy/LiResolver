@@ -39,9 +39,9 @@ class LicenseRepair:
         self.fixable_nid_ch = []
 
         self.nid_termListFromChildren = {} #（保存一下这个信息）
-        self.incomNid_termLists = {} # dict {部分nid: [list[TermObject], list[TermObject]] } # 下界和上界 # 比下界更紧and比上界更松。
+        self.incomNid_termLists = {} # dict {部分nid: [list[TermObject], list[TermObject]] } # 下界和上界
         self.incomNid_filepathLists = {}
-        # (和上面格式一致，只是对应换成 对应的term的对应极性的filepath。) # 一个atti对应的filepath可能是多个，用|来连接。...好复杂
+        # (和上面格式一致，只是对应换成 对应的term的对应极性的filepath。) # 一个atti对应的filepath可能是多个，用|来连接
         # 其实不用放 filepath from parent need。（反正exception的文本中不用涉及父节点。）
         # {nid: list[ dict{atti: str-filepaths} ]} 不用str-filepaths 只写nid即可 （list[nid]）（然后简化成了一个nid）
 
@@ -83,7 +83,6 @@ class LicenseRepair:
         （1）PL有copyright holder信息，再看内层有没有，最终可能修复至少一个位置
         （2）PL若无对应，那只能修复PL这一个位置
 
-         ‘copyright’ and ‘(C)’,  ‘authored by’, ‘written by’, etc.
         :return:返回对应位置的nid，列表。
         '''
         self.fixable_nid = []
@@ -92,7 +91,6 @@ class LicenseRepair:
         self.fixable_nid_ch = []
         '''先找到PL的'''
         PL_holders = []
-        #PL_holder_possibleSent = [] ## (有的不规范不典型表达 可能检测不出holder，但若PL和很多CL都是这样写的句子 也可以表示它们是同一作者，，，)
         for nid in self.licenseTree.expand_tree(mode=Tree.DEPTH, sorting=False):
 
             if nid >= 2:
@@ -106,7 +104,7 @@ class LicenseRepair:
 
                 ntag = self.licenseTree[nid].tag
                 # 检查ntag的内容
-                text = ntag  ## .lower() 原本的大小写对NER很有影响.
+                text = ntag
                 sentsList = utils.sentences_split(text)
                 for sent in sentsList:
                     if utils.check_text_for_CPS(sent):  # （存在copyright相关语句）
@@ -222,10 +220,6 @@ class LicenseRepair:
 
     def repair_generate_one_custom_license(self,termlist_need_fromChildren, termlist_need_fromParent):
         '''
-        理论上:应该生成一段文本 极性是在这两个termlist的范围圈定之间的
-        (目前 暂时只用termlist_need_fromChildren的直接生成)
-        暂时先这样。。。
-        （其实 如果可以在“范围内”的波动自由的话，就可以考虑用“最小修改”来求一个优化结果？？
         '''
         l_custom = ''
         termContent_template = utils.read_custom_template()
@@ -456,12 +450,10 @@ class LicenseRepair:
             corr_cid = []
             for cid in termlists_of_cid.keys():
                 termlist_tmp = termlists_of_cid[cid]
-                # （这里暂时简化了 原本应该写函数去寻找哪些term的content是一样的）
-                # （这里直接按顺序来的 因为当时nid_license就是按顺序放进去的）
                 if not termlist_tmp:
                     continue
                 tt = termlist_tmp[j]
-                # 设置缺省认定值 （改成最初就都设成123 省的兼容性检测时不统一 导致bug）
+                # 设置缺省认定值
                 # tt.set_absentAtti()
                 terms_sameCont_diffAtti.append(tt)
                 corr_cid.append(cid)
@@ -509,7 +501,7 @@ class LicenseRepair:
                 else:
                     termlists_of_cid[cid] = nid_termListFromChildren[cid]
                 '''
-                termlists_of_cid[cid] = self.nid_license[cid].termList #### 【1109】
+                termlists_of_cid[cid] = self.nid_license[cid].termList #### 【1109确定的版本】
 
                 ############################
                 # if nid in [4,48,51]:
@@ -555,8 +547,7 @@ class LicenseRepair:
 
     def get_incomNodes_needs_from_parent(self, nid):
         '''
-        对那些不兼容的位置，只向上看一层，
-        》》其实实际编程时 这个就简单了，父节点最多一个，那“高层需求”基本就是复制父节点的termlist，，，
+        对那些不兼容的位置，只向上看一层，，
         '''
         nParid = self.licenseTree.parent(nid).identifier
         termlist_from_parent = self.nid_license[nParid].termList
@@ -700,56 +691,6 @@ class LicenseRepair:
 
 
 
-'''
-from pythonModuleStructreWithLicenses import demo
-licenseTree = demo.get_license_tree('testPro')
-lr = LicenseRepair(licenseTree=licenseTree)
-lr.show_licenseTree()
-
-整个pipeline：
-拿到项目文件夹，生成树，每个许可证生成对应的license对象，[]
-    一边检查copyright找到能修复的位置，
-    一边做层次兼容性检测 从最内层向外 汇总当前位置被内层导致的需求 找到所有发生不兼容的位置，[]
-    对每一个发生不兼容and能修复的位置：
-        输入需求，（每个位置有对应的termList和termList_filepathList）
-        做修复：
-            判断是否有需求矛盾：
-                如果有：生成exception许可证
-                如果无，判断数据库是否存在许可证满足需求：
-                    存在：推荐已有许可证
-                    不存在：生成自定义许可证
-        输出此位置应该使用的许可证内容。
-
-兼容性检测：将若干个license对象 消去其中相同的term，分析输出为若干个term对象，
-输出termList和termList_filepathList
-termList_filepathList：每个term对象 对应的 哪些文件/模块/包等等，
-
-需求：一个列表，其中每个元素是一个term对象，
-需求矛盾（term对象矛盾）：某几个term对象 其内容或动作或什么一样 但极性或对象啥的不一样，
-
-
-'''
-
-
-
-
-'''
-ancestor;successor
-parent;children
-
-tree的一些个函数：
-.is_branch(nid) 是的 下一层的子节点
-
-node的一些个函数：
-.tag
-.identifier
-.predecessor()
-.successors()
-
-'''
-
-
-
 
 '''模块案例测试'''
 def runLicenseRepair(repo, nlp, ld, ner_model_ee5, re_args, re_model, ac_model):
@@ -775,7 +716,7 @@ def runLicenseRepair(repo, nlp, ld, ner_model_ee5, re_args, re_model, ac_model):
                        nid_textNeedTE=nid_textNeedTE, nid_matchedLnameList=nid_matchedLnameList)
     # lr.show_licenseTree()
 
-    # 遍历输出看一下 （确实是DFS的顺序）
+    # 遍历输出看一下
     print('关于projectLicenseTree的一些遍历信息：')
     for nid in lr.licenseTree.expand_tree(mode=Tree.DEPTH, sorting=False):
         if nid == 1:
@@ -792,8 +733,6 @@ def runLicenseRepair(repo, nlp, ld, ner_model_ee5, re_args, re_model, ac_model):
     print('所有结点：', lr.licenseTree.nodes.keys())
     print('叶子结点：', [nd.identifier for nd in lr.licenseTree.leaves()])
 
-
-    # (有可能一个许可证都没有，此时会导致root变成唯一的叶子结点》》最好趁早退出)
     if len(lr.licenseTree.leaves())==1 and lr.licenseTree.leaves()[0].identifier==1:
         return lr, lr.hasPL, 0, 0, 0, []
 
@@ -870,27 +809,3 @@ def runLicenseRepair(repo, nlp, ld, ner_model_ee5, re_args, re_model, ac_model):
 
 
 
-
-
-
-
-
-
-
-
-
-
-'''
-REGEXP = [
-    re.compile(r'^copyright \(c\) \.$'),
-    re.compile(r'^copyright\s*\(c\) ((?!\.+).*?) \. (?:.*)$'),
-    re.compile(r'((?!\.+).*?)\.\s* copyright\s*\(c\) ((?!\.+).*?) \. (?:.*)$'),
-    re.compile(r'((?!\.+).*?)\.\s* copyright\s*\(c\) ((?!\.+).*?)\.(?:.*)$')
-]
-s = 'copyright(c) aaaaaa . ..  bbbbbb'
-s = 'mit license. copyright (c) gao ya . '
-matched = REGEXP[2].match(s)
-if matched:
-    name = matched.groups(0)[1]
-    print(name)
-'''

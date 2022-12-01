@@ -11,12 +11,7 @@ import os
 import utils
 
 rootDir = os.path.dirname(os.path.abspath(__file__))
-#unDir = rootDir + '\\unzips\\'
-#unDir = r'D:\GY\OSSL2\repos'
-
-unDir = r'D:\GY\OSSL2\repos_simpled'
-#unDir = r'D:\Python\OSSL2\evaluation_projects/repos_simpled_200/'
-# unDir = os.path.join(os.path.dirname(rootDir), 'repos')
+unDir = os.path.join(os.path.dirname(rootDir), 'repos') #####
 
 
 outputDir000 = rootDir + '/output/'
@@ -26,20 +21,6 @@ DIR = outputDir
 
 licenseDir = os.path.dirname(os.path.abspath(__file__))+'/data/licenses'
 
-
-
-def checkLicenseFile(filename,dir):
-    licensett = ''
-    if re.findall(r'^license$', filename, flags=re.IGNORECASE) or re.findall(r'^license\.[a-zA-Z]+', filename,
-                                                                             flags=re.IGNORECASE) \
-            or re.findall(r'^copying$', filename, flags=re.IGNORECASE) or re.findall(r'^copying\.[a-zA-Z]+', filename,
-                                                                                     flags=re.IGNORECASE):
-        with open(os.path.join(dir,filename), 'r', encoding="utf-8") as fr:
-            for line in fr.readlines():
-                if line:
-                    licensett += line.strip() + '. '
-        return licensett
-    return licensett
 
 
 REGEXP = [
@@ -76,52 +57,6 @@ def checkPackageImport2(filepath):
         return []
 
 
-def checkLicenseInline(filepath):
-    '''
-    安装ninka（需要在Linux上另外处理）
-    使用其Comment extractor， Split sentences， Filter good sentences
-    得到inline部分
-    '''
-    # return "" # 读取ninka对其处理结果文件
-
-    '''
-    为了简单测试，可以暂先使用下面的替代函数
-    '''
-    try:
-        targetText = ""
-        with open(filepath, 'r', encoding="utf-8") as fr:
-            fg = False
-            for line in fr.readlines():
-                if line.strip().startswith("#"):
-                    targetText += line.strip()[1:].strip() + '. '
-                elif line.strip().startswith("\'\'\'") or line.strip().startswith("\"\"\""):
-                    if not fg:
-                        # start ...
-                        if line.strip().endswith("\'\'\'", 3, len(line.strip())) or line.strip().endswith("\"\"\"", 3,
-                                                                                                          len(
-                                                                                                              line.strip())):
-                            targetText += line.strip()[3:-3].strip() + '. '
-                        else:
-                            targetText += line.strip()[3:].strip() + '. '
-                            fg = True
-                    else:
-                        fg = False
-                elif line.strip():
-                    if fg:
-                        targetText += line.strip() + '. '
-                    else:
-                        break
-        fr.close()
-        if re.findall('license', targetText, flags=re.IGNORECASE):
-            # print(filepath+str(len(targetText)))
-            return targetText
-        else:
-            return ""
-    except Exception:
-        print(filepath)
-        return ""
-
-
 
 
 from treelib import Tree, Node
@@ -144,15 +79,6 @@ def add_node(parent, ziji, ziji_content, checked=True):
     :param ziji_content:
     :param checked:
     :return:
-    '''
-    '''
-    if checked:
-        for cnd in tree.children(parent):
-            if cnd.tag == ziji_content:
-                rmv_id() ## 加上这个“为节省成本” 但会引起bug（而且父子关系和filepath看起来会混乱），，，
-                # 》》》暂时先不要了，    
-                #虽然确实会让 所有结点数量，不兼容节点数量，会让数量变多挺多的，，，
-                return cnd.identifier
     '''
     tree.create_node(parent=parent, identifier=ziji, tag=ziji_content)
     return ziji
@@ -199,7 +125,7 @@ def checkPro(dir, parent, fg):
     dir_prt = parent
     pac_prt = parent
 
-    print(repoDir) ### 真的有在充分遍历里面的
+    print(repoDir) ###
 
     # （先看file后看py）（对结果有影响。）
     FileList = []
@@ -215,7 +141,7 @@ def checkPro(dir, parent, fg):
     #####
     for dd in FileList:
         dd_path = os.path.join(repoDir, dd)
-        print(dd_path)  ### 真的有在充分遍历里面的
+        print(dd_path)  ###
 
         text = ''
         # if not dd_path.endswith(".py") and utils.checkLicenseFileName(dd):
@@ -354,21 +280,6 @@ def check_PL(repo):
 
 
 
-
-
-def get_licenses():
-
-    for repo in os.listdir(unDir):
-        add_node(tree.root, gen_id(), 'root', checked=False)
-        checkPro(repo,1)
-        tree.show()
-        '''
-        并不与文件结构完全一致。某些模块没有显性许可证，那会默认与它最近父节点一致，那这个边就会省略。
-        '''
-
-
-    return tree
-
 '''
 【这里是调用入口 从licenseRepair类那里】
 '''
@@ -405,61 +316,6 @@ def get_license_tree(repo):
 
 
 
-
-
-
-def cleanIt(text):
-    text = re.sub('!/usr/bin/env python', ' ', text)
-    text = re.sub('! /usr/bin/env python', ' ', text)
-    text = re.sub('!/usr/bin/python', ' ', text)
-    text = re.sub('! /usr/bin/python', ' ', text)
-    text = re.sub('-\*- coding: utf-8 -\*-', ' ', text)
-    text = re.sub('-\*-coding:utf-8-\*-', ' ', text)
-    text = re.sub('coding utf-8', ' ', text)
-    text = re.sub('=+', ' ', text)
-    text = re.sub('-+', ' ', text)
-    text = re.sub('#+', ' ', text)
-    text = re.sub('\*+', ' ', text)
-    text = re.sub('~+', ' ', text)
-    text = re.sub(' +', ' ', text)
-
-    legalCharSet = [
-        '(', ')', '[', ']', ':', ';', '-', '"', ',', '.', ' '
-    ]
-    ww = ""
-    for c in text.lower():
-        if (c >= 'a' and c <= 'z') or c in legalCharSet:
-            ww += c
-    ww = re.sub(' +', ' ', ww)
-
-    return ww
-
-
-def cleanInlineLicenses():
-    numm = 0
-    for pro in os.listdir(DIR):
-        # every pro
-        for file in os.listdir(os.path.join(DIR, pro)):
-            if file.startswith("inline-license-"):
-                # every text
-                text = ""
-                with open(os.path.join(DIR, pro, file), 'r', encoding='utf-8') as fr:
-                    for line in fr.readlines():
-                        if line.strip():
-                            text += line.strip() + ' '
-                fr.close()
-
-                # clean the inline text ...
-                # 尽可能地去躁
-                text1 = cleanIt(text)
-                with open(os.path.join(DIR, pro, file.replace("inline-", "inline2-")), 'w', encoding='utf-8') as fw:
-                    fw.write(text1)
-                fw.close()
-
-        numm += 1
-        print(str(numm) + '/' + str(len(os.listdir(DIR))))
-
-
 library_license = {}
 
 def init():
@@ -471,17 +327,4 @@ def init():
     fr.close()
     #print(library_license)
     #print("library_license: " + str(len(library_license)))
-
-if __name__ == '__main__':
-
-    '''
-
-    '''
-    init()
-
-
-
-
-    #######
-    get_licenses()
 

@@ -9,8 +9,6 @@ from model.config import config as term_config
 import utils
 
 '''
-一个条款 = 内容 + 极性
-(内容是按23列表来固定的)
 '''
 class Term:
     def __init__(self, content=None, atti=None, condInxs=None, recipient=None):
@@ -124,7 +122,7 @@ class Term:
         '''
         是否存在不一致(冲突)
         '''
-        if self.content == termB.content and self.atti != termB.atti: # （这个规则，之后再斟酌吧，，）
+        if self.content == termB.content and self.atti != termB.atti: #
             return True
         return False
 
@@ -135,7 +133,7 @@ class Term:
 
 
     def isSameContent(self, termB):
-        if self.content == termB.content : # （这个规则，之后再修改，，）
+        if self.content == termB.content : #
             return True
         return False
 
@@ -159,15 +157,6 @@ class Term:
         self比termB 一样or更加严格
         （前置情况：他俩已经都非confilct了，都是1/2/3）
 
-        加上了对condition的考虑：
-        ：：：
-        看两者的条件列表是否一一对应兼容 （用递归吧(只需要看本身atti即可)）
-        若是：看两者本身atti是否兼容；
-        若否：看两者的反atti是否兼容；
-
-        v1 加上了对recipient的比较。
-        >> v2（可以不比较 因为已经在content的信息里了）
-        >> v3 还是得比较 但是“只有当动作+对象一样时（都无或者都有一样）”才有atti的可比性；否则看做不同的条款 兼容性没关系，，，
         '''
 
         if not termlistA or not termlistB:
@@ -294,7 +283,7 @@ class Term:
         # elif len(attis)==1 and moreStrictAtti == term_config['attiLabel_type'][4]:
             # atti_cids[term_config['attiLabel_type'][4]] = corr_cid
         elif len(attis) == 1:
-            atti_cids[attis[0]] = corr_cid[0] #（取一个代表file即可）
+            atti_cids[attis[0]] = corr_cid[0]
 
 
 

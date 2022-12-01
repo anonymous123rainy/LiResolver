@@ -94,7 +94,7 @@ class Licensedataset:
             for j, atti in enumerate(row[2:]):
                 # 某许可证的一个条款with极性
                 li.termList[j].setAtti(atti=atti)
-                # 设置缺省认定值 （这里就都设成123 省的兼容性检测时不统一 导致bug）
+                # 设置缺省认定值
                 li.termList[j].set_absentAtti()
                 # ### 更新self.termList
                 # li.addTerm(tt)
@@ -104,7 +104,7 @@ class Licensedataset:
 
             print("load ld: ", i)
 
-        ##self.printLicenseList() #### （海星 cond）
+        ##self.printLicenseList()
         return self.licenseList
 
 
@@ -115,7 +115,7 @@ class Licensedataset:
             for k in kk:
                 if k==name:
                     return li.termList
-        print('【这个matchedLiName竟然在ld里面找不到对应的】,,,,,', name)
+        print(name)
 
         # （记录一下）
         with open(os.path.join(DIR, 'gap_spdx_tldr.txt'), 'a', encoding="utf-8") as fw:

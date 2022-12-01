@@ -222,32 +222,6 @@ class License:
         return
 
 
-    def extract_termRelated(self, nlp, ner_model_ee5, re_args, re_model, term_jj):
-        '''
-        self.words, self.labs, self.entities_chunks 从中找一个动作实体对应的部分
-        进行细节抽取
-        :return:
-        '''
-        etcInx = self.jj_etChunkInx[term_jj]
-
-        entity_chunk = self.entities_chunks[etcInx]
-        # 围绕每一个动作实体
-        actionStr = ' '.join(self.words[entity_chunk[1]:entity_chunk[2]])
-        action_j = int(entity_chunk[0])
-        action_atti = self.termList[term_jj].getAtti() ###
-
-        sent_beginIdx, sentStr = utils.getItsSequence(self.words, entity_chunk)
-        action_beginIdx = entity_chunk[1] - sent_beginIdx  # action在sent里的位置索引
-        action_endIdx = entity_chunk[2] - sent_beginIdx  # (左闭右开)
-
-
-        ## 创建TermRelated对象 初始化
-        tr = TermRelated(sentence=sentStr, action_idxs=(action_beginIdx, action_endIdx),
-                         action=actionStr,action_j=action_j, action_atti=action_atti)
-        tr.run_extract(ner_model_ee5, re_args, re_model)  # （实体预测在tr那儿，这儿一步到位就行）
-
-        return tr ##
-
 
 
 
@@ -319,65 +293,6 @@ class License:
                 #     return False
 
         return True
-
-
-
-
-
-
-    def parse_get_entity_mention(self, extractType, tokenizer, nlp, prefix, midFilesDir, max_seq_length):
-        '''
-        该许可证文本 解析出 想要的entity_mention，
-        并且生成对应ids，
-        :return:
-        '''
-        entity_mention_set = [] # ids
-
-        fw1 = open(os.path.join(midFilesDir, 'mention_strs' + prefix + '.txt'), 'w', encoding="utf-8")
-        fw2 = open(os.path.join(midFilesDir,'mention_ids' + prefix + '.txt'), 'w', encoding="utf-8")
-
-
-        sentences = utils.sentences_split(self.text)
-
-        for sent in sentences:
-            sent = sent.strip()
-            if not sent:
-                continue
-
-            sent = ' '.join(sent.split(' ')[:max_seq_length]) ###
-
-            outputFormat = 'json'
-            dpResult = nlp.annotate(sent, properties={'annotators': 'depparse', 'outputFormat': outputFormat, })
-            # 句子太长时 可能会无法输出，dpResult为空？
-            try:
-                enhancedPlusPlusDependencies = json.loads(dpResult)["sentences"][0]["enhancedPlusPlusDependencies"]
-            except Exception as e:
-                print(e)
-                print(dpResult)
-                print(sent)
-                continue
-
-            tokens = json.loads(dpResult)["sentences"][0]["tokens"]
-
-            findedIDSet = utils.extract_entity_mention(extractType, tokens, enhancedPlusPlusDependencies, 0, [])
-            for tp in findedIDSet:
-                tp.reverse()
-                phrase = utils.get_words_from_ids(tp, tokens)
-                phrase_ids = utils.generate_bert_ids_for_sentence(tokenizer=tokenizer, sentence=phrase, fg=1)
-                entity_mention_set.append(phrase_ids)
-                #
-                fw1.write(' '.join(phrase) + '\n')
-                fw2.write(' '.join([str(a) for a in phrase_ids]) + '\n')
-
-        #entity_mention_set = list(set(entity_mention_set))
-        entity_mention_set = utils.get_unique_lists_in_list(entity_mention_set)
-        self.entity_mention_set = entity_mention_set
-        # print('self.entity_mention_set', len(self.entity_mention_set))
-
-        fw1.close()
-        fw2.close()
-
-        return entity_mention_set
 
 
 

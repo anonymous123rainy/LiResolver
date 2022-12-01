@@ -15,11 +15,6 @@ from EE5.LocateTerms import ner_predict
 
 '''
 
-在许可证理解的过程中 辅助的一个类（没有实际意义）
-
-一个条款 = 围绕一个条款动作的 其他细节
-（单位：某条款动作所在的句子 范围内可以找到的条款细节们）
-
 '''
 
 DIR = os.path.dirname(os.path.abspath(__file__))+'/'
@@ -37,7 +32,6 @@ class TermRelated:
         self.Recipient = 'this work ' # str
         self.Attitude = 'can ' # str
         self.Condition = [] # list[ dict{"action":str, "performer":str, "recipient":str, "attitude":str  } ]
-        # condition中可能有多个action 各自捎带着一些细节，，， （若当前tr就是指的是一个conditionAction那它的self.Condition自然没有就行。）
 
 
 
@@ -241,45 +235,9 @@ class TermRelated:
             dataList_final.append(sp_dict)
 
 
-        # (其实也不太需要过滤了，毕竟实体识别已经是一层过滤了（下游就直接遍历找 遇到一个就认可吧）)
-
         return test_pre_logits, dataList_final
 
 
 
 
 
-
-
-    ''' （用不上了，，，，，） '''
-    def genCandidates_0(self, nlp):
-        '''
-
-        :return: 所有实体（无差别）
-        '''
-        outputFormat = 'json'
-        dpResult = nlp.annotate(self.Sentence, properties={'annotators': 'depparse', 'outputFormat': outputFormat, })
-        enhancedPlusPlusDependencies = json.loads(dpResult)["sentences"][0]["enhancedPlusPlusDependencies"]
-        tokens = json.loads(dpResult)["sentences"][0]["tokens"]
-        # print(tokens)
-
-        candidates = extract_its_hierac_nsubj(enhancedPlusPlusDependencies, self.Action_idxs[0]+1)
-        candidates.extend(extract_its_hierac_obj(enhancedPlusPlusDependencies, self.Action_idxs[0]+1))
-        candidates.extend(extrac_its_hierac_mod(enhancedPlusPlusDependencies, self.Action_idxs[0]+1))
-        candidates.extend(extract_its_hierac_cond(enhancedPlusPlusDependencies, self.Action_idxs[0]+1))
-        candidates = get_unique_lists_in_list(lis=candidates, isInt = True)
-
-        # self.printCandiResults(candidates)
-
-        return candidates
-
-
-    def printCandiResults(self, candidates):
-        print('------------------')
-        print(self.Sentence)
-        print(' '.join(self.Sentence.split(' ')[self.Action_idxs[0]:self.Action_idxs[1]]))
-        print(':::')
-        print(candidates)
-        for ids in candidates:
-            phrase = ' '.join([self.Sentence.split(' ')[id-1] for id in ids])
-            print(phrase)
