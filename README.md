@@ -12,7 +12,9 @@ In this paper, we propose LiResolver, a fine-grained, scalable, and flexible too
 
 ## Features
 
-
+### Fine-grained license understanding
+### Hierarchy incompatibility Detection
+### License recommendation and generation
 
 
 
