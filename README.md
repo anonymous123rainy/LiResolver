@@ -70,6 +70,14 @@ The incompatibility resolution results will write into the folder `LiResolver/RE
 
 ## Example
 
+#### Repair by recommanding official licenses
+
+For example, in the OSS project `jekyc/wig`, it claims a project license in the LICENSE text, which is similar to _BSD-2-Clause_, and 
+there are other licenses for its imported third-party packages, e.g., _re_, _urllib_, _hashlib_ in the code file _wig-master/wig/classes/request2.py_, 
+which are licensed as _BSD-3-Clause_, _MIT-license_, _Python Software Foundation License_, respectively. 
+Among them, the license terms of _BSD-3-Clause_ and _Python Software Foundation License_ are both stricter than that of _BSD-2-Clause_, 
+thus triggering license incompatibility issues. Here, LiResolver can help resolve it by recommanding some proper official licenses 
+for the project license, for instance, GNU Lesser General Public License v2.1, Zope Public License 2.1, Python Software Foundation License 2.0 .etc. 
 
 
 
