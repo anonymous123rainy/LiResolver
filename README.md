@@ -70,14 +70,18 @@ The incompatibility resolution results will write into the folder `LiResolver/RE
 
 ## Example
 
-#### Repair by recommanding official licenses
 
-For example, in the OSS project `jekyc/wig`, it claims a project license in the LICENSE text, which is similar to _BSD-2-Clause_, and 
+For example, in the OSS project `jekyc/wig`, after license understanding step, we found that it claims a project license in the LICENSE text, which is similar to _BSD-2-Clause_, and 
 there are other licenses for its imported third-party packages, e.g., _re_, _urllib_, _hashlib_ in the code file _wig-master/wig/classes/request2.py_, 
 which are licensed as _BSD-3-Clause_, _MIT-license_, _Python Software Foundation License_, respectively. 
 Among them, the license terms of _BSD-3-Clause_ and _Python Software Foundation License_ are both stricter than that of _BSD-2-Clause_, 
-thus triggering license incompatibility issues. Here, LiResolver can help resolve it by recommanding some proper official licenses 
+thus triggering license incompatibility issues. Here, **LiResolver can help resolve it by recommanding some proper official licenses** 
 for the project license, for instance, GNU Lesser General Public License v2.1, Zope Public License 2.1, Python Software Foundation License 2.0 .etc. 
 
 
-
+In the OSS project `facebookresearch/torchbeast`, the code file _torchbeast-main/torchbeast/monobeast.py_ has a inline license for its own, 
+and there are other licenses for its imported third-party packages, e.g., _traceback_, _torch_, 
+which are licensed as _Python Software Foundation License_, _BSD-3-Clause_, respectively. As the license understanding and incompatibility localization steps, 
+the license terms of _monobeast.py_ are not compatible with its component licenses above, and **LiResolver can help solve it by generating a custom license** 
+because of the absence of proper official licenses, which can be showed as: 
+_This license claims that you can distribute, modify, commercial use, rename, compensate for damages, disclose source, include notice, include original, give credit, contact author, include install instructions, compensate for damages, pay above use threshold. This license claims that you must include copyright for this, include license for this, state changes. This license claims that you cannot hold liable, sublicense, use trademark, private use, place warranty, use patent claims, relicense, statically link._
