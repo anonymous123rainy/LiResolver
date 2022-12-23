@@ -40,7 +40,15 @@ In this paper, we propose ***LiResolver***, a fine-grained, scalable, and flexib
 
 #### create dependency environment
 
-`conda create ...`
+`conda create --name liresolver python=3.7`
+
+`conda activate liresolver`
+
+`pip install -r requirements.txt`
+
+
+
+
 
 
 #### Run LiResolver
