@@ -40,12 +40,11 @@ In this paper, we propose ***LiResolver***, a fine-grained, scalable, and flexib
 
 #### create dependency environment
 
-`conda create --name liresolver python=3.7`
-
-`conda activate liresolver`
-
-`pip install -r requirements.txt`
-
+```
+conda create --name liresolver python=3.7
+conda activate liresolver
+pip install -r requirements.txt
+```
 
 
 
@@ -57,9 +56,11 @@ In this paper, we propose ***LiResolver***, a fine-grained, scalable, and flexib
 
 place the OSS project you want to analyze into the folder `LiResolver/repos/`, and run
 
-`cd LiResolver`
+```
+cd LiResolver
+python3 main.py
+```
 
-`python3 main.py`
 
 
 **Output:**
