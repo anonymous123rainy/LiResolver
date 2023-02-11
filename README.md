@@ -10,13 +10,6 @@ In this paper, we propose ***LiResolver***, a fine-grained, scalable, and flexib
 
 
 
-## Features
-
-### Fine-grained license understanding
-### Hierarchy incompatibility Detection
-### License recommendation and generation
-
-
 
 ## Installation
 
@@ -87,3 +80,7 @@ which are licensed as _Python Software Foundation License_, _BSD-3-Clause_, resp
 the license terms of _monobeast.py_ are not compatible with its component licenses above, and **LiResolver can help solve it by generating a custom license** 
 because of the absence of proper official licenses, which can be showed as: 
 _This license claims that you can distribute, modify, commercial use, rename, compensate for damages, disclose source, include notice, include original, give credit, contact author, include install instructions, compensate for damages, pay above use threshold. This license claims that you must include copyright for this, include license for this, state changes. This license claims that you cannot hold liable, sublicense, use trademark, private use, place warranty, use patent claims, relicense, statically link._
+
+### An example output
+![image](img/example-output.JPG)
+
