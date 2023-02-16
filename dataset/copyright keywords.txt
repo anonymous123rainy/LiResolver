@@ -1,0 +1,13 @@
+ks = [
+        'authored by',
+        'author:',
+        'author=',
+        'copyright:',
+        'copyright (c)',
+        'copyright ©',
+        'copyrighted by',
+        'copyright [',
+        'copyright {',
+        'copyright 20',
+        'copyright (c) 20',
+    ]
